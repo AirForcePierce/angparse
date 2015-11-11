@@ -34,14 +34,25 @@ module.exports = exports['default'];
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-var AddController = function AddController($scope, $http) {
+var AddController = function AddController($scope, $http, PARSE) {
+
+  var url = PARSE.URL + 'classes/whiskey';
+
+  var Whiskey = function Whiskey(obj) {
+    this.name = obj.name;
+    this.maker = obj.maker;
+    this.hasTried = false;
+  };
 
   $scope.addWhiskey = function (obj) {
-    console.log(obj);
+    var w = new Whiskey(obj);
+    $http.post(url, w, PARSE.CONFIG).then(function (res) {
+      $scope.whiskey = {};
+    });
   };
 };
 
-AddController.$inject = ['$scope', '$http'];
+AddController.$inject = ['$scope', '$http', 'PARSE'];
 
 exports['default'] = AddController;
 module.exports = exports['default'];
@@ -52,9 +63,16 @@ module.exports = exports['default'];
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-var ListController = function ListController($scope) {};
+var ListController = function ListController($scope, $http, PARSE) {
 
-ListController.$inject = ['$scope'];
+  var url = PARSE.URL + 'classes/whiskey';
+
+  $http.get(url, PARSE.CONFIG).then(function (res) {
+    $scope.whiskeys = res.data.results;
+  });
+};
+
+ListController.$inject = ['$scope', '$http', 'PARSE'];
 
 exports['default'] = ListController;
 module.exports = exports['default'];
@@ -82,7 +100,15 @@ var _controllersListcontroller = require('./controllers/listcontroller');
 
 var _controllersListcontroller2 = _interopRequireDefault(_controllersListcontroller);
 
-_angular2['default'].module('app', ['ui.router']).config(_config2['default']).controller('AddController', _controllersAddcontroller2['default']).controller('ListController', _controllersListcontroller2['default']);
+_angular2['default'].module('app', ['ui.router']).constant('PARSE', {
+  URL: 'https://api.parse.com/1/',
+  CONFIG: {
+    headers: {
+      'X-Parse-Application-Id': 'fjX7nUYwr1L83Bf8DapCyDKWMGxaKa2A68LacU1T',
+      'X-Parse-REST-API-Key': 'UV25fSnRriVgBgWLHDghnVhC7PGxkg3ys289EJQm'
+    }
+  }
+}).config(_config2['default']).controller('AddController', _controllersAddcontroller2['default']).controller('ListController', _controllersListcontroller2['default']);
 
 console.log('Hello, World');
 
